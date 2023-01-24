@@ -26,7 +26,7 @@ class JSON_Improved(json.JSONEncoder):
         else:
             return super(json.JSONEncoder, self).default(obj)
 
-app.json_encoder = JSON_Improved
+app.json_provider_class = JSON_Improved # json_encoder
 
 @app.route('/api/v1/resources/get_chores', methods=['GET', 'POST'])
 def do_something():
@@ -65,4 +65,30 @@ def get_chore_rate():
         results=utils.get_chore_rate(),
     )
 
+@app.route('/api/v1/resources/get_chore_rates', methods=['GET', 'POST'])
+def get_chore_rates():
+    return jsonify(
+        isError=False, 
+        message='Success', 
+        statusCode=200, 
+        results=utils.get_chore_rates().to_html(index=False),
+    )
+
+
+@app.route('/api/v1/resources/set_chore_rate', methods=['POST'])
+def set_chore_rate():    
+    if request.form.get('rate'):
+        rate = float(request.form.get('rate'))
+        return jsonify(
+            isError=False, 
+            message='Success', 
+            statusCode=200, 
+            results=utils.update_chore_rate(ChoreRate=rate),
+        )
+    else:
+        return jsonify(
+            isError=True, 
+            message='No rate specified', 
+            statusCode=500, 
+        )
 app.run(port=5000)
