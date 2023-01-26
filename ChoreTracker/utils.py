@@ -425,14 +425,22 @@ def get_person_chores(
         where i.ChoreDate='{chore_date}'
         and i.completed=0
         and r.PersonId='{personId}'
-        group by PersonName
+        -- group by PersonName
         order by PersonName
     """)
     return list(zip(chore_df['ChoreInstanceID'], chore_df['name'], chore_df['Completed'])) 
 
 def get_chores_table():
     chore_df = query_db(f"""
-        select c.name, i.choreDate, p.PersonName, i.completed, i.validated, i.banked
+        select 
+            p.PersonName, 
+            i.choreDate, 
+            c.name, 
+            iif (i.completedBy IS NULL, '', i.completedBy) as CompletedBy,
+            i.choreInstanceId, 
+            i.completed, 
+            i.validated, 
+            i.banked
         from
         choreinstances as i
         join chores as c
@@ -443,7 +451,33 @@ def get_chores_table():
         join
         people as p
         on r.PersonId = p.PersonId
+        
+        order by choreDate, PersonName
+    """)
+    return chore_df.to_html(index=False)
+
+def get_earnings_table():
+    chore_df = query_db(f"""
+        select 
+            p.PersonName, 
+            sum(i.completed) as NumberCompleted, 
+            sum(i.Rate) as TotalEarned, 
+            sum(i.Rate)/100 as PoundsEarned,
+            sum(i.validated) as NumberValidated, 
+            sum(i.banked) as NumberBanked
+        from
+        choreinstances as i
+        join chores as c
+        on i.choreid = c.choreid
+        join
+        choreresponsibilities as r
+        on i.ChoreId = r.CHoreId
+        join
+        people as p
+        on r.PersonId = p.PersonId
+        where completed=1
+        and completedBy = p.PersonId
         group by PersonName
         order by PersonName
     """)
-    return chore_df.to_html()
+    return chore_df.to_html(index=False)

@@ -144,16 +144,20 @@ def complete_chore_instance():
 @app.route('/api/v1/resources/get_chores_table', methods=['GET', 'POST'])
 def get_chores_table():    
     return utils.get_chores_table()
+    
+@app.route('/api/v1/resources/get_earnings_table', methods=['GET', 'POST'])
+def get_earnings_table():    
+    return utils.get_earnings_table()
 
 @app.route('/api/v1/resources/uncomplete_chore_instance', methods=['POST'])
 def uncomplete_chore_instance():    
-    if request.args.get('ChoreInstanceId'):
-        ChoreInstanceId = int(request.args.get('ChoreInstanceId'))
+    if request.args.get('choreInstanceId'):
+        ChoreInstanceId = int(request.args.get('choreInstanceId'))
         return jsonify(
             isError=False, 
             message='Success', 
             statusCode=200, 
-            results=utils.uncomplete_chore_instance(ChoreInstanceId=ChoreInstanceId),
+            results=utils.uncomplete_chore_instance(chore_instance_id=ChoreInstanceId),
         )
     else:
         return jsonify(

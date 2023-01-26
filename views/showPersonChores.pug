@@ -5,9 +5,9 @@ block content
     if chores 
         ul 
             for chore in chores 
-                li  
+                div(class="d-grid gap-2 col-6 mx-auto") 
                     a(href="/completeChoreInstance?choreInstanceId="+chore[0]+"&personId="+personId, type="button", class="btn btn-primary btn-lg") #{chore[1]}
-    
+                    p
     else 
         p No chores found
     
