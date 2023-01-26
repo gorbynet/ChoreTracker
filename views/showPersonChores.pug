@@ -1,0 +1,13 @@
+extends layout 
+
+block content 
+    h1=title 
+    if chores 
+        ul 
+            for chore in chores 
+                li  
+                    a(href="/completeChoreInstance?choreInstanceId="+chore[0]+"&personId="+personId, type="button", class="btn btn-primary btn-lg") #{chore[1]}
+    
+    else 
+        p No chores found
+    

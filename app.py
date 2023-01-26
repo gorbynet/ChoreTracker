@@ -28,16 +28,8 @@ class JSON_Improved(json.JSONEncoder):
 
 app.json_provider_class = JSON_Improved # json_encoder
 
-@app.route('/api/v1/resources/get_chores', methods=['GET', 'POST'])
-def do_something():
-    if request.method == 'POST':
-        return jsonify(
-            isError=False, 
-            message='Success', 
-            statusCode=200, 
-            results=utils.get_chores().to_json(),
-        )
-    else:
+@app.route('/api/v1/resources/get_chores', methods=['GET'])
+def get_chores():
         return jsonify(
             isError=False, 
             message='Success', 
@@ -45,6 +37,15 @@ def do_something():
             results=utils.get_chores().to_json(),
         )
 
+
+@app.route('/api/v1/resources/update_choreinstances', methods=['POST'])
+def update_choreinstances():
+        return jsonify(
+            isError=False, 
+            message='Success', 
+            statusCode=200, 
+            results=utils.update_choreinstances(),
+        )
 
 @app.route('/api/v1/resources/get_people', methods=['GET', 'POST'])
 def get_people():
@@ -64,6 +65,34 @@ def get_chore_rate():
         statusCode=200, 
         results=utils.get_chore_rate(),
     )
+
+@app.route('/api/v1/resources/get_chore_counts_by_person', methods=['GET', 'POST'])
+def get_chore_counts_by_person():
+    return jsonify(
+        isError=False, 
+        message='Success', 
+        statusCode=200, 
+        results=utils.get_chore_counts_by_person() # .to_json(),
+    )
+
+@app.route('/api/v1/resources/get_person_chores', methods=['GET', 'POST'])
+def get_person_chores():
+
+    if request.args.get('personId'):
+        print(request.args.get('personId'))
+        return jsonify(
+            isError=False, 
+            message='Success', 
+            statusCode=200, 
+            results=utils.get_person_chores(personId=request.args.get('personId')),
+        )
+        
+    else:
+        return jsonify(
+            isError=True, 
+            message='Error: No Person ID found', 
+            statusCode=500
+        )
 
 @app.route('/api/v1/resources/get_chore_rates', methods=['GET', 'POST'])
 def get_chore_rates():
@@ -91,4 +120,47 @@ def set_chore_rate():
             message='No rate specified', 
             statusCode=500, 
         )
+
+
+@app.route('/api/v1/resources/complete_chore_instance', methods=['POST'])
+def complete_chore_instance():    
+    if request.args.get('choreInstanceId'):
+        ChoreInstanceId = int(request.args.get('choreInstanceId'))
+        PersonId = int(request.args.get('personId'))
+        print(f"Marking {ChoreInstanceId} complete")
+        return jsonify(
+            isError=False, 
+            message='Success', 
+            statusCode=200, 
+            results=utils.complete_chore_instance(chore_instance_id=ChoreInstanceId, person_id=PersonId),
+        )
+    else:
+        return jsonify(
+            isError=True, 
+            message='No ChoreInstanceId specified', 
+            statusCode=500, 
+        )
+        
+@app.route('/api/v1/resources/get_chores_table', methods=['GET', 'POST'])
+def get_chores_table():    
+    return utils.get_chores_table()
+
+@app.route('/api/v1/resources/uncomplete_chore_instance', methods=['POST'])
+def uncomplete_chore_instance():    
+    if request.args.get('ChoreInstanceId'):
+        ChoreInstanceId = int(request.args.get('ChoreInstanceId'))
+        return jsonify(
+            isError=False, 
+            message='Success', 
+            statusCode=200, 
+            results=utils.uncomplete_chore_instance(ChoreInstanceId=ChoreInstanceId),
+        )
+    else:
+        return jsonify(
+            isError=True, 
+            message='No ChoreInstanceId specified', 
+            statusCode=500, 
+        )
+
+
 app.run(port=5000)

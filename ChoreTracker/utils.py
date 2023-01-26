@@ -370,3 +370,80 @@ def bank_owing_amounts(
     """)
 
     return True
+
+
+def get_chore_counts_by_person(
+    chore_date: dt.date = None
+):
+    if chore_date is None:
+        chore_date = dt.date.today()
+    chore_df = query_db(f"""
+        select p.PersonId, PersonName, choredate, count(ChoreInstanceId) as ChoreCount
+        from
+        choreinstances as i
+        join
+        choreresponsibilities as r
+        on i.ChoreId = r.CHoreId
+        join
+        people as p
+        on r.PersonId = p.PersonId
+        where i.ChoreDate='{chore_date}'
+        and i.Completed=0
+        group by PersonName
+        order by PersonName
+    """)
+    # chore_df = chore_df.T
+    # return chore_df.to_json() # 
+    return list(zip(chore_df['PersonID'], chore_df['PersonName'], chore_df['ChoreCount']))
+
+
+
+
+def get_person_chores(
+    personId: int = None,
+    chore_date: dt.date = None
+):
+    if personId is None:
+        raise NoPersonIdSuppliedError
+
+    if chore_date is None:
+        chore_date = dt.date.today()
+    
+    print("PersonID:", personId)
+    chore_df = query_db(f"""
+        select c.name, i.choreinstanceid, i.completed
+        from
+        choreinstances as i
+        join chores as c
+        on i.choreid = c.choreid
+        join
+        choreresponsibilities as r
+        on i.ChoreId = r.CHoreId
+        join
+        people as p
+        on r.PersonId = p.PersonId
+        where i.ChoreDate='{chore_date}'
+        and i.completed=0
+        and r.PersonId='{personId}'
+        group by PersonName
+        order by PersonName
+    """)
+    return list(zip(chore_df['ChoreInstanceID'], chore_df['name'], chore_df['Completed'])) 
+
+def get_chores_table():
+    chore_df = query_db(f"""
+        select c.name, i.choreDate, p.PersonName, i.completed, i.validated, i.banked
+        from
+        choreinstances as i
+        join chores as c
+        on i.choreid = c.choreid
+        join
+        choreresponsibilities as r
+        on i.ChoreId = r.CHoreId
+        join
+        people as p
+        on r.PersonId = p.PersonId
+        group by PersonName
+        order by PersonName
+    """)
+    return chore_df.to_html()
