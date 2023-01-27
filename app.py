@@ -7,6 +7,25 @@ from time import sleep
 import numpy as np
 import sqlite3
 from ChoreTracker import utils
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
+def daily_update():
+    # Putting in a regular job to calculate the day's
+    # scheduled/recurring chores  
+    # check whether today's chores have already been added
+    if len (utils.get_active_chores()) == 0:
+        print("Scheduler is alive!")
+        utils.update_choreinstances()
+    else:
+        print(f"Found {len(utils.get_active_chores())} chores for today")
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(daily_update,'interval',hours=2)
+sched.start()
+
+daily_update()
+
 
 app = flask.Flask(__name__)
 app.config['DEBUG'] = True
@@ -27,6 +46,15 @@ class JSON_Improved(json.JSONEncoder):
             return super(json.JSONEncoder, self).default(obj)
 
 app.json_provider_class = JSON_Improved # json_encoder
+
+@app.route('/api/v1/resources/get_active_chores', methods=['GET'])
+def get_active_chores():
+        return jsonify(
+            isError=False, 
+            message='Success', 
+            statusCode=200, 
+            results=utils.get_active_chores().to_json(),
+        )
 
 @app.route('/api/v1/resources/get_chores', methods=['GET'])
 def get_chores():
