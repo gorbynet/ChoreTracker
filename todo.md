@@ -12,5 +12,5 @@
 - Show completion rate  
 
 ## Admin/cron functions  
-- --Update list daily-- DONE  
+- ~~Update list daily~~ DONE  
 
