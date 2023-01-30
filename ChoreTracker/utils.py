@@ -57,15 +57,32 @@ def create_chore(
     if name is None:
         raise NoChoreNameSuppliedError
     if start_date is None:
-        raise NoStartDateSuppliedError
+        start_date = dt.date.today()
+        # raise NoStartDateSuppliedError
     if start_time is None:
-        raise NoStartTimeSuppliedError
-    
+        start_time = dt.time(7)
+        # raise NoStartTimeSuppliedError
+
+    if schedule is None:
+        schedule = '1D'
+
+    if window is None:
+        window = '4H'
+
+    if repeats is None:
+        repeats = False
+        
+    if active is None:
+        active = False
+
     if not re.match(r'\d+[YWDMH]', schedule):
         raise IncorrectTimeWindowFormatError
 
     if not re.match(r'\d+[YWDMH]', window):
         raise IncorrectTimeWindowFormatError
+
+    print(f'''name: {name}, schedule: {schedule}, start_date: {start_date}, 
+        start_time: {start_time}, window: {window}, REPEATS: {repeats}, active: {active}''')
 
     update_db(f"""
         INSERT INTO chores 
@@ -89,6 +106,11 @@ def get_chores():
     return query_db(q="""
         SELECT * FROM chores
     """)
+
+def get_full_chores_table():
+    return query_db(q="""
+        SELECT * FROM chores
+    """).to_html()
 
 roles = query_db(""" select * from roles """) # .fetchall()
 role_ids = dict(zip(roles['RoleName'], roles['RoleID']))

@@ -10,6 +10,8 @@ var showPersonChoresRouter = require('./routes/showPersonChores');
 var getPersonChoresRouter = require('./routes/getPersonChores');
 var completeChoreInstanceRouter = require('./routes/completeChoreInstance');
 var uncompleteChoreInstanceRouter = require('./routes/uncompleteChoreInstance');
+var createChoreRouter = require('./routes/createChore');
+var createChoreActionRouter = require('./routes/createChoreAction');
 // var similarRouter = require('./routes/similar');
 
 var app = express();
@@ -45,9 +47,12 @@ app.use('/getPersonChores', getPersonChoresRouter);
 app.use('/showPersonChores', showPersonChoresRouter);
 app.use('/completeChoreInstance', completeChoreInstanceRouter);
 app.use('/uncompleteChoreInstance', uncompleteChoreInstanceRouter);
+app.use('/createChore', createChoreRouter);
+app.use('/createChoreAction', createChoreActionRouter);
+
 
 app.listen(3000, function() {
-  console.log('Listening on port 3000');
+  console.log('Listening on port 3000...');
 });
 
 module.exports = app;

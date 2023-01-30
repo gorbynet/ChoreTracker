@@ -173,6 +173,10 @@ def complete_chore_instance():
 def get_chores_table():    
     return utils.get_chores_table()
     
+@app.route('/api/v1/resources/get_full_chores_table', methods=['GET', 'POST'])
+def get_full_chores_table():    
+    return utils.get_full_chores_table()
+
 @app.route('/api/v1/resources/get_earnings_table', methods=['GET', 'POST'])
 def get_earnings_table():    
     return utils.get_earnings_table()
@@ -194,5 +198,84 @@ def uncomplete_chore_instance():
             statusCode=500, 
         )
 
+#def create_chore(
+#    name: str = None,
+#    schedule: str = '1D',
+#    start_date: dt.date = dt.date.today(),
+#    start_time: dt.time = dt.time(7),
+#    window: str = '4H',
+#    repeats: bool = True,
+#    active: bool = True,
+
+def check_var(var):
+    if not var is None:
+        if len(var) == 0:
+            # convert empty responses to default values
+            return None
+        elif var == 'on':
+            # handle checkboxes
+            return True
+    return var
+
+@app.route('/api/v1/resources/create_chore', methods=['POST'])
+def create_chore(): 
+    error=False   
+    print(request.form)
+    if request.form.get('name'):
+        # check_var converts values to defaults
+        # or expected values
+        ChoreName = check_var(request.form.get('name'))
+        ChoreSchedule = check_var(request.form.get('schedule'))
+        ChoreStartDate = check_var(request.form.get('start_date'))
+        ChoreStartTime = check_var(request.form.get('start_time'))
+        ChoreWindow = check_var(request.form.get('window'))
+        ChoreRepeats = check_var(request.form.get('repeats'))
+        ChoreActive = check_var(request.form.get('active'))
+
+        print('ChoreName: ', ChoreName)
+        print('ChoreSchedule: ', ChoreSchedule)
+        print('ChoreStartDate: ', ChoreStartDate)
+        print('ChoreStartTime: ', ChoreStartTime)
+        print('ChoreWindow: ', ChoreWindow)
+        print('ChoreRepeats: ', ChoreRepeats)
+        print('ChoreActive: ', ChoreActive)
+
+        results=utils.create_chore(
+            name=ChoreName,
+            schedule=ChoreSchedule,
+            start_date=ChoreStartDate,
+            start_time=ChoreStartTime,
+            window=ChoreWindow,
+            repeats=ChoreRepeats,
+            active=ChoreActive,
+            )
+        if results:
+            return jsonify(
+                isError=False, 
+                message='Success', 
+                statusCode=200,
+                results=results
+            )
+        else:
+            error=True
+    else:
+        print("Didn't get name")
+        error=True
+
+    if error:
+        return jsonify(
+            isError=True, 
+            message='Error creating chore', 
+            statusCode=500, 
+            results=False
+        )
+    else:
+        print(f"error not set: {error}")
+        return jsonify(
+            isError=True, 
+            message='Error creating chore', 
+            statusCode=500,  
+            results=False
+        )
 
 app.run(port=5000)
