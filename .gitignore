@@ -3,3 +3,4 @@ package-lock.json
 package.json
 node_modules/
 node_modules/.package-lock.json
+__pycache__/new_app.cpython-310.pyc
