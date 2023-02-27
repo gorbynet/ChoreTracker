@@ -60,7 +60,7 @@ app.json_provider_class = JSON_Improved # json_encoder
 @app.route('/')
 def index(methods=['GET']):
     people = json.loads(utils.get_chore_counts_by_person().T.to_json())
-    print("people:", people)
+    # print("people:", people)
     return render_template('index.html', title='People with chores today', people = people)
     
 @app.route('/showPersonChores')
@@ -68,7 +68,7 @@ def showPersonChores(methods=['GET']):
     if request.args.get('personId'):
         # should have personId and personName
         chores = json.loads(utils.get_person_chores(personId=request.args.get('personId')).T.to_json())
-        print(chores)
+        # print(chores)
         return render_template(
             'showPersonChores.html', 
             title=request.args.get('personName'), 

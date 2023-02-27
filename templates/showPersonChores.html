@@ -17,8 +17,7 @@
             <a href="/completeChore?personId={{ personId }}&personName={{ title }}&choreInstanceId={{chores[chore]['ChoreInstanceID']}}", 
                 type="button", class="btn btn-primary btn-lg"> {{ chores[chore]['name'] }} </a>
             {% else %}
-            <a href="/completeChore?personId={{ personId }}&personName={{ title }}&choreInstanceId={{chores[chore]['ChoreInstanceID']}}", 
-                type="button", class="btn btn-primary btn-lg"> {{ chores[chore]['name'] }} (Complete)</a>
+            <button type="button" class="btn btn-primary btn-lg" disabled> {{ chores[chore]['name'] }} (Complete)</a>
             {% endif %}
             
         {% endfor %}
