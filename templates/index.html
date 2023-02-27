@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <div>
+    <h1>{{ title }}</h1> 
+    <p></p>
+    </div>
+    <!-- 
+    // Need to do something to populate this with a list of people with active chores.
+    // Need an API endpoint for this...
+    -->
+    <script>
+        var people = {{ people | tojson }}
+        for (item in people ) {
+            console.log( item ); 
+            console.log( people[item]);
+            }</script>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        {% for person in people %}
+            <!-- <p>{{person}}</p> -->
+            <a href="/showPersonChores?personId={{ people[person]['PersonID'] }}&personName={{people[person]['PersonName']}}", 
+                type="button", class="btn btn-primary btn-lg"> {{ people[person]['PersonName'] }} ({{ people[person]['ChoreCount'] }}) </a>
+            
+        {% endfor %}
+    </div>
+    
+{% endblock %}

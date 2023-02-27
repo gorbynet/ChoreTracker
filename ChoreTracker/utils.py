@@ -148,10 +148,13 @@ def check_if_active(row: pd.Series) -> bool:
         if unit == 'W':
             interval = dt.timedelta(days=freq * 7)
         if unit == 'M':
-            # timedelta doens't do months, need
+            # TODO:
+            # timedelta doesn't do months, need
             # to handle this better
             interval = dt.timedelta(days=freq * 30)
         if unit == 'Y':
+            # TODO:
+            # What about leap years?
             interval = dt.timedelta(days=freq * 365)
         
         while test_date < dt.date.today():
@@ -274,18 +277,18 @@ class UnrecognisedChoreInstanceIDError(Exception):
     pass
 
 def complete_chore_instance(
-    chore_instance_id: int = None,
-    person_id: int = None,
+    choreInstanceId: int = None,
+    personId: int = None,
 ):
-    if person_id is None:
+    if personId is None:
         raise NoPersonIdSuppliedError
 
-    if chore_instance_id is None:
+    if choreInstanceId is None:
         raise NoChoreInstanceIdSuppliedError
 
 
     chore_instance_df = query_db(f"""
-        select * from choreinstances where choreinstanceid = {chore_instance_id} and Completed=0
+        select * from choreinstances where choreinstanceid = {choreInstanceId} -- and Completed=0
     """)
 
     if not len(chore_instance_df) == 1:
@@ -297,7 +300,7 @@ def complete_chore_instance(
         select r.* from choreresponsibilities as r
         join choreinstances as i
         on r.choreid = i.choreid
-        where PersonId = {person_id} and i.choreinstanceid = {chore_instance_id}
+        where PersonId = {personId} and i.choreinstanceid = {choreInstanceId}
     """)
 
     if not len(person_df) == 1:
@@ -308,51 +311,51 @@ def complete_chore_instance(
     # and the person is assigned to it, so they're allowed
     # to complete it
     update_db(f"""
-        UPDATE choreinstances SET Completed = 1, CompletedBy={person_id} where 
-        Choreinstanceid = {chore_instance_id}
+        UPDATE choreinstances SET Completed = 1, CompletedBy={personId} where 
+        Choreinstanceid = {choreInstanceId}
     """)
 
     return True
 
     
 def uncomplete_chore_instance(
-    chore_instance_id: int = None,
+    choreInstanceId: int = None,
 ):
 
-    if chore_instance_id is None:
+    if choreInstanceId is None:
         raise NoChoreInstanceIdSuppliedError
 
     update_db(f"""
         UPDATE choreinstances SET Completed = 0, Validated=0, Banked=0, CompletedBy=NULL where 
-        Choreinstanceid = {chore_instance_id}
+        Choreinstanceid = {choreInstanceId}
     """)
 
     return True
 
    
 def invalidate_chore_instance(
-    chore_instance_id: int = None,
+    choreInstanceId: int = None,
 ):
 
-    if chore_instance_id is None:
+    if choreInstanceId is None:
         raise NoChoreInstanceIdSuppliedError
 
     update_db(f"""
         UPDATE choreinstances SET Validated=0 where 
-        Choreinstanceid = {chore_instance_id}
+        Choreinstanceid = {choreInstanceId}
     """)
 
     return True
 
 def validate_chore_instance(
-    chore_instance_id: int = None,
+    choreInstanceId: int = None,
 ):
 
-    if chore_instance_id is None:
+    if choreInstanceId is None:
         raise NoChoreInstanceIdSuppliedError
 
     chore_check = query_db(f"""
-        select Completed from choreinstances where choreinstanceid={chore_instance_id}
+        select Completed from choreinstances where choreinstanceid={choreInstanceId}
         """)
     if not len(chore_check) > 0:
         raise UnrecognisedChoreInstanceIDError
@@ -366,18 +369,18 @@ def validate_chore_instance(
     update_db(f"""
         UPDATE choreinstances SET Validated = 1
         where 
-        Choreinstanceid = {chore_instance_id}
+        Choreinstanceid = {choreInstanceId}
     """)
 
     return True
 
 def bank_owing_amounts(
-    person_id: int = None, 
+    personId: int = None, 
     banked_date: dt.date = None
     ):
     # How do we roll this back if it's done by mistake?
     # maybe set a banked date
-    if person_id is None:
+    if personId is None:
         raise NoPersonIdSuppliedError
 
     if banked_date is None:
@@ -386,7 +389,7 @@ def bank_owing_amounts(
     update_db(f"""
         update choreinstances set banked=1, bankeddate='{banked_date}'
         where 
-        completedby={person_id} and 
+        completedby={personId} and 
         validated = 1 and
         banked = 0
     """)
@@ -410,13 +413,14 @@ def get_chore_counts_by_person(
         people as p
         on r.PersonId = p.PersonId
         where i.ChoreDate='{chore_date}'
-        and i.Completed=0
+        -- and i.Completed=0
         group by PersonName
         order by PersonName
     """)
     # chore_df = chore_df.T
     # return chore_df.to_json() # 
-    return list(zip(chore_df['PersonID'], chore_df['PersonName'], chore_df['ChoreCount']))
+    # return list(zip(chore_df['PersonID'], chore_df['PersonName'], chore_df['ChoreCount']))
+    return chore_df
 
 
 
@@ -445,12 +449,13 @@ def get_person_chores(
         people as p
         on r.PersonId = p.PersonId
         where i.ChoreDate='{chore_date}'
-        and i.completed=0
+        -- and i.completed=0
         and r.PersonId='{personId}'
         -- group by PersonName
         order by PersonName
     """)
-    return list(zip(chore_df['ChoreInstanceID'], chore_df['name'], chore_df['Completed'])) 
+    # return list(zip(chore_df['ChoreInstanceID'], chore_df['name'], chore_df['Completed'])) 
+    return chore_df
 
 def get_chores_table():
     chore_df = query_db(f"""
@@ -476,7 +481,7 @@ def get_chores_table():
         
         order by choreDate, PersonName
     """)
-    return chore_df.to_html(index=False)
+    return chore_df #.to_html(index=False)
 
 def get_earnings_table():
     chore_df = query_db(f"""

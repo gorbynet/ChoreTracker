@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <div>
+    <h1>{{ title }}</h1> 
+    <p></p>
+    </div>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        Page {{ pagename }} raised an error: {{ errorname }}
+    </div>
+    
+{% endblock %}

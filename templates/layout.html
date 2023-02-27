@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
+                rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+        <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" /> -->
+    </head>
+   <body class="container text-center">
+        <div>
+        {% block body required %}{% endblock %}
+        </div>
+    </body>
+   <footer> 
+        <div class="container themed-container text-center">
+            <a href='/'>Main menu</a>
+        </div>
+    </footer>
+</html>

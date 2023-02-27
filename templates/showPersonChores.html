@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block body %} 
+    <h1>{{ title }}</h1>
+    <script>
+        var chores = {{ chores | tojson }}
+        for (item in chores ) {
+            console.log( item ); 
+            console.log( chores[item]);
+            }
+        console.log( {{ personId }})
+    </script>
+    <div>
+        
+        {% for chore in chores %}
+            {% if chores[chore]['Completed'] == 0 %}
+            <a href="/completeChore?personId={{ personId }}&personName={{ title }}&choreInstanceId={{chores[chore]['ChoreInstanceID']}}", 
+                type="button", class="btn btn-primary btn-lg"> {{ chores[chore]['name'] }} </a>
+            {% else %}
+            <a href="/completeChore?personId={{ personId }}&personName={{ title }}&choreInstanceId={{chores[chore]['ChoreInstanceID']}}", 
+                type="button", class="btn btn-primary btn-lg"> {{ chores[chore]['name'] }} (Complete)</a>
+            {% endif %}
+            
+        {% endfor %}
+    </div>    
+{% endblock %}
