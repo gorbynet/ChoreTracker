@@ -1,3 +1,8 @@
+##
+## Windows CLI:
+## flask --app new_app.py --debug run --host=0.0.0.0
+##
+
 import flask
 import json
 from flask import request, jsonify, render_template, redirect, url_for
@@ -122,3 +127,6 @@ def get_active_chores():
         )
 
 dumm_func = ApiClass(utils.get_active_chores())
+
+if __name__ == '__main__':
+    app.run(port=5000, host="0.0.0.0")
