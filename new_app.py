@@ -19,7 +19,7 @@ def daily_update():
     # Putting in a regular job to calculate the day's
     # scheduled/recurring chores  
     # check whether today's chores have already been added
-    if len (utils.get_active_chores()) == 0:
+    if len (utils.get_todays_chores()) == 0:
         print("Scheduler is alive!")
         utils.update_choreinstances()
     else:
@@ -112,21 +112,40 @@ def completeChore(methods=['GET']):
                 errorname='UnableToCompleteChoreError'
             )
 
-@app.route('/api/v1/resources/get_active_chore', methods=['GET'])
-def dummy():
-    pass
 
+@app.route('/createChore', methods=['GET'])
+def createChore():
+    return render_template("createChore.html", title="Create new chore")
 
-@app.route('/api/v1/resources/get_active_chores', methods=['GET'])
-def get_active_chores():
-        return jsonify(
-            isError=False, 
-            message='Success', 
-            statusCode=200, 
-            results=utils.get_active_chores().to_json(),
-        )
+@app.route('/createChoreAction', methods=['POST'])
+def createChoreAction():
+    result = request.form
+    json_result = dict(result)
+    print(json_result)
+    # need to validate and then add this chore to the chores table  
+    """
+    name: str = None,
+    schedule: str = '1D',
+    start_date: dt.date = dt.date.today(),
+    start_time: dt.time = dt.time(7),
+    window: str = '4H',
+    repeats: bool = True,
+    active: bool = True,
+    """
+    # {'choreName': 'Test chore', 'schedule': '2D', 'startDate': '2023-02-28', 'start_time': '07:00', 'window': '4H', 'responsible': ''}
+    if utils.create_chore(
+            name=json_result['choreName'],
+            schedule=json_result['schedule'],
+            start_date=json_result['startDate'],
+            start_time=json_result['start_time'],
+            window=json_result['window'],
+            repeats=json_result['repeats'],
+            active=json_result['active'],
+        ):
+        
+    # return render_template("result.html", result=result, app_version=app_version)
 
-dumm_func = ApiClass(utils.get_active_chores())
+    return True
 
 if __name__ == '__main__':
     app.run(port=5000, host="0.0.0.0")

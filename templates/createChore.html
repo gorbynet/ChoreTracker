@@ -1,44 +1,67 @@
 {% extends "layout.html" %} 
 
-{$ block body %}
+{% block body %}
     <h1>{{title}} </h1>
     
-    
+    <!--
     ##    'name=' + req. 'Test API chore',
     ##    'schedule': '2D',
     ##    'start_date': dt.date.today() + dt.timedelta(days=1),
     ##    'start_time': dt.time(8),
     ##    'window': '6H',
     ##    'repeats': False,
-    ##    'active': True 
+    ##    'active': True
+    -->
+    <div class="container col-6 text-start">
+    <form action = "/createChoreAction" method = "POST">
+        <div class="form-group">
+            <label for="name">Chore name</label>
+            <input type="text" class="form-control" id="choreNameId" name="choreName" placeholder="Chore name">
+        </div>
 
-    form(action= "/createChoreAction", method="post", class= "myForm")
-        div
-            p Chore name:
-                input(type="text", name="name", class= "name", placeholder="Enter chore name..")
-        div
-            p Schedule:
-                input(type="text", name="schedule", class= name="phone", "myInput" placeholder="1D")
-        div
-            p Start date:
-                input(type="text", name="start_date", class= "myInput", placeholder="2022-01-28")
-        div
-            p Start time:
-                input(type="text", name="start_time", class= "myInput", placeholder="7")
-        div
-            p Window:
-                input(type="text", name="window", class= "myInput", placeholder="4H")
-        div
-            p Repeats:
-                input(type="checkbox", name="repeats", class= "myInput")
-        div
-            p Chore active:
-                input(type="checkbox", name="active", class= "myInput", checked)
-        div
-            p Person responsible:
-                // This should probably be a drop-down
-                input(type="text", name="responsible", placeholder="Name of person responsible (for non-repeating chores)")
-        div
-            input(type='submit')
+        <div class="form-group">
+            <!-- need to validate this input is \d[HWMY]-->
+            <label for="schedule">Schedule</label>
+            <input type="text" class="form-control" id="scheduleId" name="schedule" placeholder="2D">
+        </div>
+
+        <div class="form-group">
+            <label for="startDate">Start date</label>
+            <input type="date" class="form-control" id="startDateId" name="startDate" placeholder="2023-02-28">
+        </div>
+
+        <div class="form-group">
+            <label for="startTime"> Start time:</label>
+            <input type="time" name="start_time" class= "form-control" placeholder="7">
+        </div>
+
+        <div class="form-group">
+            <label for="window">Time window for completion</label>
+            <input type="text" name="window" class="form-control" placeholder="4H">
+        </div>
+
+        <div class="form-group">
+            <label for="repeats"> Repeats</label>
+            <input type="checkbox" name="repeats" class= "form-control" checked>
+        </div>
+
+        <div class="form-group">
+            <label for="active"> Chore active:
+            <input type="checkbox" name="active" class= "form-control" checked>
+        </div>
+        
+        <!-- This should probably be a drop-down -->
+        <div class="form-group">
+            <label for="responsible">Person responsible (for non-repeating chores)</label>
+            
+            <input type="text" name="responsible" placeholder="Name of person responsible (for non-repeating chores)">
+        </div>
+
+        <p></p>
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form> 
+    </div>
+    
 
 {% endblock %}

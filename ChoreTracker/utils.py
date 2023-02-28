@@ -172,6 +172,7 @@ def get_active_chores(
 ):
     if chore_date is None:
         chore_date = dt.date.today()
+
     chore_df = query_db(
         """ SELECT * FROM chores where active = 1 """
     )
@@ -198,6 +199,17 @@ def get_chore_rate(chore_date: dt.datetime = None):
             (select max(datetime(StartDate)) as max_date from chorerates where datetime(StartDate) <= datetime('{chore_date}')) as m
         where datetime(StartDate) = m.max_date
         """)['Rate'].values.max()
+
+def get_todays_chores(
+    chore_date: dt.datetime = None
+    ):
+    if chore_date is None:
+        chore_date = dt.datetime.now()
+        
+    df = query_db(
+        f""" select * from choreinstances where date(ChoreDate)=date('{chore_date}')"""
+    )
+    return df
 
 def update_choreinstances(
     chore_date: dt.datetime = None

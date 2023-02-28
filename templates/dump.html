@@ -12,4 +12,32 @@
                     textarea(name='abstr', rows='5', cols='50') #{abstr}
             input(type='submit', value='Submit') -->
 
-            
+
+            form(action= "/createChoreAction", method="post", class= "myForm")
+            div
+                p Chore name:
+                    input(type="text", name="name", class= "name", placeholder="Enter chore name..")
+            div
+                p Schedule:
+                    input(type="text", name="schedule", class= name="phone", "myInput" placeholder="1D")
+            div
+                p Start date:
+                    input(type="text", name="start_date", class= "myInput", placeholder="2022-01-28")
+            div
+                p Start time:
+                    input(type="text", name="start_time", class= "myInput", placeholder="7")
+            div
+                p Window:
+                    input(type="text", name="window", class= "myInput", placeholder="4H")
+            div
+                p Repeats:
+                    input(type="checkbox", name="repeats", class= "myInput")
+            div
+                p Chore active:
+                    input(type="checkbox", name="active", class= "myInput", checked)
+            div
+                p Person responsible:
+                    // This should probably be a drop-down
+                    input(type="text", name="responsible", placeholder="Name of person responsible (for non-repeating chores)")
+            div
+                input(type='submit')       
