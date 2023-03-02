@@ -107,6 +107,15 @@ def get_chores():
         SELECT * FROM chores
     """)
 
+
+def get_chore_details(ChoreId: int = None):
+    if ChoreId is None:
+        raise NoChoreIdSuppliedError
+    
+    return query_db(q=f"""
+        SELECT * FROM chores where choreid = {ChoreId}
+    """)
+
 def get_full_chores_table():
     return query_db(q="""
         SELECT * FROM chores
@@ -205,7 +214,7 @@ def get_todays_chores(
     ):
     if chore_date is None:
         chore_date = dt.datetime.now()
-        
+
     df = query_db(
         f""" select * from choreinstances where date(ChoreDate)=date('{chore_date}')"""
     )
@@ -218,7 +227,7 @@ def update_choreinstances(
         chore_date = dt.datetime.now()
     active_chores = get_active_chores(chore_date.date)
     update_db(f"""
-        delete from choreinstances where date(ChoreDate)=date('{chore_date}')
+        delete from choreinstances where date(ChoreDate)=date('{chore_date.date()}') and Completed = 0
     """)
     chore_rate = get_chore_rate(chore_date)
     # ['ChoreInstanceID',
@@ -233,12 +242,20 @@ def update_choreinstances(
     validated = False
     banked = False
     for ChoreID in active_chores['ChoreID'].values:
-        update_db(f"""
-            INSERT INTO choreinstances 
-            (ChoreID, ChoreDate, Completed, Validated, Rate, Banked)
-            VALUES 
-            ({ChoreID}, '{chore_date.date()}', {completed}, {validated}, {chore_rate}, {banked})
-        """)
+        if len(query_db(
+                f"""
+                select * from choreinstances where ChoreID={ChoreID} and ChoreDate='{chore_date.date()}'
+                """
+            )) == 0:
+            update_db(f"""
+                INSERT INTO choreinstances 
+                (ChoreID, ChoreDate, Completed, Validated, Rate, Banked)
+                VALUES 
+                ({ChoreID}, '{chore_date.date()}', {completed}, {validated}, {chore_rate}, {banked})
+            """)
+        else:
+            pass
+            # print(f"Found {ChoreID} in choreinstances for today")
 
 class UnrecognisedChoreIDError(Exception):
     pass

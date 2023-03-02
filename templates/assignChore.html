@@ -1,0 +1,41 @@
+{% extends "layout.html" %} 
+
+{% block body %}
+    <h1>{{title}} </h1>
+    <script>
+        var people = {{ people | tojson }}
+        for (person in people ) {
+            console.log( "assignChore people" )
+            console.log( person ); 
+            console.log( people[person]);
+            }
+        var chore = {{ chore_details | tojson }}
+        for (item in chore ) {
+            console.log( "assignChore chore_details" )
+            console.log( item ); 
+            console.log( chore[item]);
+            }
+    </script>
+    <div class="container col-6 text-start">
+        <h2>Chore: {{ chore_details['0']['name'] }}</h2>
+    </div>
+
+    <div class="container col-6 text-start">
+        <form action = "/assignChoreAction" method = "POST">
+            <input type="hidden" name="ChoreId" value="{{ chore_details['0']['ChoreID'] }}" >
+        {% for person in people %}
+            
+            <div class="form-group">
+                <input type="checkbox" name="{{ people[person]['PersonID'] }}" class="form-check-input" >
+                <label for="{{ people[person]['PersonID'] }}"> {{ people[person]['PersonName'] }}</label>
+            </div>
+            
+        {% endfor %}
+
+        <p></p>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    
+
+{% endblock %}

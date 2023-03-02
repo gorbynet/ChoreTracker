@@ -10,14 +10,14 @@
             }
         console.log( {{ personId }})
     </script>
-    <div>
+    <div class="d-grid gap-2 col-6 mx-auto">
         
         {% for chore in chores %}
             {% if chores[chore]['Completed'] == 0 %}
             <a href="/completeChore?personId={{ personId }}&personName={{ title }}&choreInstanceId={{chores[chore]['ChoreInstanceID']}}", 
                 type="button", class="btn btn-primary btn-lg"> {{ chores[chore]['name'] }} </a>
             {% else %}
-            <button type="button" class="btn btn-primary btn-lg" disabled> {{ chores[chore]['name'] }} (Complete)</a>
+            <button type="button" class="btn btn-primary btn-lg" disabled> {{ chores[chore]['name'] }} (Complete)</button>
             {% endif %}
             
         {% endfor %}

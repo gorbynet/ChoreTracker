@@ -121,7 +121,7 @@ def createChore():
 def createChoreAction():
     result = request.form
     json_result = dict(result)
-    print(json_result)
+    
     # need to validate and then add this chore to the chores table  
     """
     name: str = None,
@@ -133,6 +133,12 @@ def createChoreAction():
     active: bool = True,
     """
     # {'choreName': 'Test chore', 'schedule': '2D', 'startDate': '2023-02-28', 'start_time': '07:00', 'window': '4H', 'responsible': ''}
+    for cbox in ['repeats', 'active']:
+        if cbox in json_result:
+            json_result[cbox] = True
+        else:
+            json_result[cbox] = False
+
     if utils.create_chore(
             name=json_result['choreName'],
             schedule=json_result['schedule'],
@@ -142,10 +148,54 @@ def createChoreAction():
             repeats=json_result['repeats'],
             active=json_result['active'],
         ):
-        
-    # return render_template("result.html", result=result, app_version=app_version)
+        # assume chore is going to be the last one created 
+        # with the specified name, and therefore have the highest ChoreId
+        chores_df=utils.get_chores()
+        ChoreId=chores_df[chores_df['name'] == json_result['choreName']]['ChoreID'].max()
+        # chore_details = utils.get_chore_details(ChoreId=ChoreId).to_json()
+        # people = utils.get_people().T.to_json()
+        # print(ChoreId, chore_details, people)
+        return redirect(url_for('assignChore', ChoreId=ChoreId))
+    
+    else:
+        return render_template("error.html", pageName="createChore", errorName="UnableToCreateChore")
 
     return True
+
+
+@app.route('/assignChore', methods=['POST', 'GET'])
+def assignChore():
+    if request.args.get('ChoreId'):
+        ChoreId = request.args.get('ChoreId')
+        # get some details of the chore
+        chore_details = json.loads(utils.get_chore_details(ChoreId=ChoreId).T.to_json())
+
+        # get a list of people who can do it
+        people = json.loads(utils.get_people().T.to_json())
+        # print("\n".join([str(v) for v in [ChoreId, chore_details, people]]))
+        return render_template("assignChore.html", title="Assign new chore", chore_details=chore_details, people=people)
+    else:
+        return render_template("error.html", pageName="assignChore", errorName="NoChoreIdSet")
+
+
+@app.route('/assignChoreAction', methods=['POST', 'GET'])
+def assignChoreAction():
+    result = request.form
+    json_result = dict(result)
+    print("assignChoreAction:", json_result)
+
+    ChoreId = int(json_result['ChoreId'])
+    del(json_result['ChoreId'])
+    for k in json_result:
+        print(int(k))
+        if not utils.set_responsibility(
+            ChoreID=ChoreId,
+            PersonID=int(k)
+        ):
+            return render_template("error.html", pageName="assignChore", errorName=f"Couldn't assign chore {ChoreId} to PersonId {k}")
+    utils.update_choreinstances()
+    return redirect(url_for('index', title="Chore assigned"))
+
 
 if __name__ == '__main__':
     app.run(port=5000, host="0.0.0.0")
