@@ -9,7 +9,16 @@
             console.log( chores[item]);
             }
         console.log( {{ personId }})
+        var earnings = {{ earnings | tojson }}
+        for (item in earnings ) {
+            console.log( item ); 
+            console.log( earnings[item]);
+            }
     </script>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <p>Earned pocket money: <b>{{ earnings['CurrentBalance'] }}</b> </p>
+        <p>Pending pocket money: <b>{{ earnings['pendingMoney'] }}</b> </p>
+    </div>
     <div class="d-grid gap-2 col-6 mx-auto">
         
         {% for chore in chores %}
@@ -22,6 +31,13 @@
             
         {% endfor %}
     </div>    
+    {% if earnings['RoleName'] == 'Parent' %}
+        <p></p>
+        <h3>Other tasks</h3>
+        <a href='/authenticateUser?target=createChore' type="button" class="btn btn-primary btn-lg">Create new chore</a>
+        <a href="/authenticateUser?target=validateChores" type="button" class="btn btn-primary btn-lg">Validate chores </a>
+        <a href="/authenticateUser?target=managePeople" type="button" class="btn btn-primary btn-lg">Manage people </a>
+    {% endif %}
 {% endblock %}
 {% block footer %}
 <div class="container themed-container text-center">

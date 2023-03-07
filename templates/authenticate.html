@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <div>
+    <h1>{{ title }}</h1> 
+    <p></p>
+    </div>
+    <!-- 
+    // Need to do something to populate this with a list of people with active chores.
+    // Need an API endpoint for this...
+    -->
+    <div class="d-grid gap-2 col-md-2 col-md-offset-5 mx-auto text-align:center;">
+        
+    <form action = "/authenticateUserAction" method = "POST">
+        <div class="form-group">
+            <label for="pin">Please enter password</label>
+            <input type="hidden" name="target" value="{{ target }}">
+            <input type="password" class="form-control" id="pinId" name="pin" >
+        </div>
+    </form>
+    </div>
+
+    
+{% endblock %}
+
+{% block footer %}
+<div class="container themed-container text-center">
+    <p></p>
+    <a href='/' type="button" class="btn btn-light btn-lg">Return to main menu</a>
+    
+</div>
+{% endblock %}

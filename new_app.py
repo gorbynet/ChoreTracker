@@ -13,7 +13,11 @@ import numpy as np
 import sqlite3
 from ChoreTracker import utils
 from apscheduler.schedulers.background import BackgroundScheduler
+import locale
+locale.setlocale(locale.LC_ALL, '')
+conv = locale.localeconv()
 
+CURRENCY_SYMBOL='£'
 
 def daily_update():
     # Putting in a regular job to calculate the day's
@@ -22,6 +26,7 @@ def daily_update():
     if len (utils.get_todays_chores()) == 0:
         print("Scheduler is alive!")
         utils.update_choreinstances()
+        print("Chores updated")
     else:
         print(f"Found {len(utils.get_active_chores())} chores for today")
 
@@ -72,12 +77,18 @@ def index(methods=['GET']):
 def showPersonChores(methods=['GET']):
     if request.args.get('personId'):
         # should have personId and personName
-        chores = json.loads(utils.get_person_chores(personId=request.args.get('personId')).T.to_json())
+        personId = request.args.get('personId')
+        chores = json.loads(utils.get_person_chores(personId=personId).T.to_json())
+        earnings = json.loads(utils.get_person_details(PersonID=personId).T.to_json())['0']
+        earnings['CurrentBalance'] = f"{locale.currency(earnings['CurrentBalance']/100)}"
+        earnings['confirmedMoney'] = f"{locale.currency(earnings['confirmedMoney']/100)}"
+        earnings['pendingMoney'] = f"{locale.currency(earnings['pendingMoney']/100)}"
         # print(chores)
         return render_template(
             'showPersonChores.html', 
             title=request.args.get('personName'), 
             chores = chores,
+            earnings=earnings,
             personId = request.args.get('personId'),
             )
     else:
@@ -96,14 +107,8 @@ def completeChore(methods=['GET']):
                 choreInstanceId=request.args.get('choreInstanceId')
             ):
             chores = json.loads(utils.get_person_chores(personId=request.args.get('personId')).T.to_json())
-            # return redirect(url_for(f'showPersonChores?personId={request.args.get("personId")}&personName={request.args.get("personName")}')
-            return render_template(
-                'showPersonChores.html', 
-                title=request.args.get('personName'), 
-                chores = chores,
-                personId = request.args.get('personId'),
-                )
-            
+            return redirect(url_for('showPersonChores', personId=request.args.get("personId"), personName=request.args.get("personName")))
+                        
         else:
             # need to show an error page
             return render_template(
@@ -121,7 +126,7 @@ def createChore():
 def createChoreAction():
     result = request.form
     json_result = dict(result)
-    
+    print(json_result)
     # need to validate and then add this chore to the chores table  
     """
     name: str = None,
@@ -132,7 +137,18 @@ def createChoreAction():
     repeats: bool = True,
     active: bool = True,
     """
-    # {'choreName': 'Test chore', 'schedule': '2D', 'startDate': '2023-02-28', 'start_time': '07:00', 'window': '4H', 'responsible': ''}
+    """ {
+        'choreName': 'Chore every two days (2)', 
+        'schedule': '2', 
+        'scheduleTimeUnit': 'D', 
+        'startDate': '2023-03-01', 
+        'start_time': '16:27', 
+        'window': '4', 
+        'windowTimeUnit': 'H', 
+        'repeats': 'on', 
+        'active': 'on'
+        }
+    """
     for cbox in ['repeats', 'active']:
         if cbox in json_result:
             json_result[cbox] = True
@@ -141,10 +157,10 @@ def createChoreAction():
 
     if utils.create_chore(
             name=json_result['choreName'],
-            schedule=json_result['schedule'],
+            schedule=json_result['schedule']+json_result['scheduleTimeUnit'],
             start_date=json_result['startDate'],
             start_time=json_result['start_time'],
-            window=json_result['window'],
+            window=json_result['window']+json_result['windowTimeUnit'],
             repeats=json_result['repeats'],
             active=json_result['active'],
         ):
@@ -194,7 +210,122 @@ def assignChoreAction():
         ):
             return render_template("error.html", pageName="assignChore", errorName=f"Couldn't assign chore {ChoreId} to PersonId {k}")
     utils.update_choreinstances()
-    return redirect(url_for('index', title="Chore assigned"))
+    return redirect(url_for('index'))
+
+@app.route('/validateChores', methods=['GET'])
+def validateChores():
+    chores_df = utils.get_chores_table()
+    chores = json.loads(chores_df[(chores_df['Completed'] == 1) & (chores_df['Validated'] == 0)].T.to_json())
+
+    return render_template("validateChores.html", title='Validate chores', chores=chores) 
+
+@app.route('/validateChoreAction', methods=['GET'])
+def validateChoreAction():
+    if request.args.get('choreInstanceId'):
+        if utils.validate_chore_instance(choreInstanceId=request.args.get('choreInstanceId')):
+            return redirect(url_for('validateChores'))
+        else:
+            return render_template('error.html', pageName="validateChoreAction", errorName=f"Couldn't validate chore instance {request.args.get('choreInstanceId')}")
+    else:
+        return render_template('error.html', pageName="validateChoreAction", errorName=f"Couldn't validate chore. No instance ID")
+    
+@app.route('/bankChores', methods=['GET'])
+def bankChores():
+    ## TODO: complete this function
+    chores_df = utils.get_chores_table()
+    chores = json.loads(chores_df[(chores_df['Completed'] == 1) & (chores_df['Validated'] == 1)].T.to_json())
+
+    return render_template("validateChores.html", title='Need to set up bank chores', chores=chores) 
+
+
+@app.route('/managePeople', methods=['GET'])
+def managePeople():
+    people_df = utils.get_people()
+    people = json.loads(people_df.T.to_json())
+
+    return render_template("managePeople.html", title='Manage people', people=people) 
+
+@app.route('/managePerson', methods=['GET'])
+def managePerson():
+    if request.args.get('personId'):
+        # need to be able to change name, role, balance
+        roles = json.loads(utils.get_roles().T.to_json())
+        person = json.loads(utils.get_person_details(PersonID=request.args.get('personId')).T.to_json())['0']
+        person['confirmedMoney'] = locale.currency(person['confirmedMoney']/100)
+        person['CurrentBalance'] = locale.currency(person['CurrentBalance']/100)
+        
+        return render_template("managePerson.html", title=f'Manage {person["PersonName"]}', person=person, roles=roles) 
+    else:
+        return render_template('error.html', pageName="managePerson", errorName=f"Couldn't manage person. No Person ID")
+    
+
+@app.route('/updatePerson', methods=['POST'])
+def updatePerson():
+    result = request.form
+    print(result)
+    if 'PersonId' in result:
+        # do some processing here to update name/balance/role
+        b = result['balance'].strip(conv['currency_symbol'])
+        amount = int(locale.atof(b)*100)
+        # convert role to role ID
+        roles=utils.get_roles()
+        roleId = roles[roles['RoleName']  == result['role']]['RoleID'].values[0]
+        if utils.update_person(
+                PersonId=result['PersonId'],
+                PersonName=result['personName'],
+                RoleId=roleId,
+                CurrentBalance=amount
+
+            ):
+            return redirect(url_for('managePerson', personId=result['PersonId']))
+        else:
+            return render_template('error.html', 
+                                   title='UpdatePerson Error',
+                                   pagename="managePerson", 
+                                   errorname=f"Couldn't manage person. Update failed")
+
+    else:
+        return render_template('error.html', 
+                               title='UpdatePerson Error', 
+                               pagename="managePerson", 
+                               errorname=f"Couldn't manage person. No Person ID")
+
+@app.route('/createPerson', methods=['GET', 'POST'])
+def createPerson():
+    # create a new blank person entry in DB, 
+    # then redirect to updatePerson page to prompt completion of details
+    if utils.create_person(
+            PersonName="No name specified",
+            RoleType="Child"
+        ):
+        people = utils.get_people()
+        personId = people[people["PersonName"]=="No name specified"]["PersonID"].max()
+        return redirect(url_for('managePerson', personId=personId))
+    else:
+        return render_template('error.html', 
+                               title='CreatePerson Error', 
+                               pagename="createPerson", 
+                               errorname=f"Couldn't create person. Error adding entry to database")
+
+
+@app.route('/authenticateUser', methods=['GET'])
+def authenticateUser():
+    
+    return render_template('authenticate.html', title="Please enter the password", target=request.args.get('target'))
+
+
+@app.route('/authenticateUserAction', methods=['POST'])
+def authenticateUserAction():
+    print(request.form)
+    if 'pin' in request.form:
+        # need to check password
+        if utils.check_password(password=request.form['pin']):
+            return redirect(url_for(request.form['target'], ))
+        else:
+            return redirect(url_for('index',))
+        
+    else:
+        return redirect(url_for('index',))
 
 
 if __name__ == '__main__':

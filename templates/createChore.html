@@ -21,8 +21,18 @@
 
         <div class="form-group">
             <!-- need to validate this input is \d[HWMY]-->
-            <label for="schedule">Schedule</label>
-            <input type="text" class="form-control" id="scheduleId" name="schedule" placeholder="2D">
+            <label for="schedule">Repetition schedule</label>
+            <div class="d-flex flex-row">
+                <input type="text" class="form-control " id="scheduleId" name="schedule" value="2">
+                <select class="form-select " aria-label="scheduleTimeUnit" name="scheduleTimeUnit">
+                    <!-- Hours option disabled as frequency higher than once a day isn't supported -->
+                    <!-- <option value="H">Hours</option> -->
+                    <option selected value="D">Days</option>
+                    <option value="W">Weeks</option>
+                    <option value="M">Months</option>
+                    <option value="Y">Years</option>
+                </select>
+            </div>
         </div>
 
         <div class="form-group">
@@ -37,24 +47,36 @@
 
         <div class="form-group">
             <label for="window">Time window for completion</label>
-            <input type="text" name="window" class="form-control" placeholder="4H">
+            <div class="d-flex flex-row">
+                <input type="text" name="window" class="form-control" value="4">
+                <select class="form-select" aria-label="windowTimeUnit" name="windowTimeUnit">
+                    <option selected value="H">Hours</option>
+                    <option value="D">Days</option>
+                    <option value="W">Weeks</option>
+                    <option value="M">Months</option>
+                    <option value="Y">Years</option>
+                </select>
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="repeats"> Repeats</label>
             <input type="checkbox" name="repeats" class="form-check-input" checked>
+            <label for="repeats"> Repeats</label>
         </div>
 
         <div class="form-group">
-            <label for="active"> Chore active:
             <input type="checkbox" name="active" class="form-check-input" checked>
+            <label for="active"> Chore active</label>
         </div>
 
         <!-- This should probably be a drop-down -->
+        <!-- Not sure it's needed at all -->
+        <!--
         <div class="form-group">
             <label for="responsible">Person responsible (for non-repeating chores)</label>
-            <input type="text" name="responsible" placeholder="Name of person responsible (for non-repeating chores)">
+            <input type="text" name="responsible" class="form-control" placeholder="Name of person responsible (for non-repeating chores)">
         </div>
+        -->
 
         <p></p>
         <button type="submit" class="btn btn-primary">Submit</button>

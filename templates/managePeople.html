@@ -18,8 +18,8 @@
     <div class="d-grid gap-2 col-6 mx-auto">
         {% for person in people %}
             <!-- <p>{{person}}</p> -->
-            <a href="/showPersonChores?personId={{ people[person]['PersonID'] }}&personName={{people[person]['PersonName']}}", 
-                type="button", class="btn btn-primary btn-lg"> {{ people[person]['PersonName'] }} ({{ people[person]['ChoreCount'] }}) </a>
+            <a href="/managePerson?personId={{ people[person]['PersonID'] }}", 
+                type="button", class="btn btn-primary btn-lg"> Manage {{ people[person]['PersonName'] }} </a>
             
         {% endfor %}
     </div>
@@ -30,6 +30,9 @@
 {% block footer %}
 <div class="container themed-container text-center">
     <p></p>
+    <a href='/createPerson' type="button" class="btn btn-light btn-lg">Create new person</a>
+    
+    <a href='/' type="button" class="btn btn-light btn-lg">Return to main menu</a>
     
 </div>
 {% endblock %}

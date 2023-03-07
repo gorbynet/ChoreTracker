@@ -1,0 +1,69 @@
+{% extends "layout.html" %} 
+
+{% block body %}
+    <h1>{{title}} </h1>
+    <script>
+        var roles = {{ roles | tojson }}
+        for (item in roles ) {
+            console.log( item ); 
+            console.log( roles[item]);
+            }    
+            
+            var person = {{ person | tojson }}
+            for (item in person ) {
+                console.log( item ); 
+                console.log( person[item]);
+                }
+    </script>
+
+    <div class="container col-6 text-start">
+    <form action = "/updatePerson" method = "POST">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="hidden" name="PersonId" value="{{ person['PersonID']}}">
+            <input type="text" class="form-control" id="personNameId" name="personName" value="{{ person['PersonName'] }}">
+        </div>
+
+        <div class="form-group">
+            <!-- need to validate this input is \d[HWMY]-->
+            <label for="role">Role</label>
+            <div class="d-flex flex-row">
+                <!-- need to do sme work to get list of roles and highlight the currently selected one for this person -->
+
+                <select class="form-select " aria-label="roleSelect" name="role">
+                    
+                    {% for role in roles %}
+                        {% if roles[role]['RoleName'] == person['RoleName'] %}
+                            <option selected value="{{ roles[role]['RoleName']}}">{{roles[role]['RoleName']}}</option>
+                        {% else %}
+                            <option value="{{roles[role]['RoleName']}}">{{roles[role]['RoleName']}}</option>
+                        {% endif %}
+                    {% endfor %}
+                    
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="balance">Current confirmed balance</label>
+            <!-- is there a numeric input type? -->
+            <input type="text" class="form-control" id="balanceId" name="balance" value="{{ person['CurrentBalance']}}">
+        </div>
+
+
+        <p></p>
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form> 
+    </div>
+    
+
+{% endblock %}
+
+{% block footer %}
+<div class="container themed-container text-center">
+    <p></p>
+    <a href='/' type="button" class="btn btn-light btn-lg">Return to main menu</a>
+    
+</div>
+{% endblock %}
