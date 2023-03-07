@@ -279,6 +279,7 @@ def update_chore_rate(ChoreRate: int = 25):
         (Rate, StartDate) 
         VALUES ({ChoreRate}, '{dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d %H:%M:%S")}')
         """)
+    return True
 
 def get_chore_rates():
     return query_db(""" SELECT * FROM chorerates""")

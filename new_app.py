@@ -327,6 +327,29 @@ def authenticateUserAction():
     else:
         return redirect(url_for('index',))
 
+@app.route('/manageRate', methods=['GET'])
+def manageRate():
+    rate=utils.get_chore_rate()
+    return render_template('manageRate.html', title="Update current chore rate", rate=rate)
+
+@app.route('/manageRateAction', methods=['POST'])
+def manageRateAction():
+    try:
+        rate = int(request.form['rate'])
+    except Exception:
+        return render_template('error.html', 
+            title='Rate Change Error', 
+            pagename="createPerson", 
+            errorname=f"Couldn't change rate. {request.form['rate']} is not a valid rate.")
+    else:
+        if utils.update_chore_rate(ChoreRate=rate):
+            return redirect(url_for('manageRate'))
+        else:
+            return render_template('error.html', 
+                title='Rate Change Error', 
+                pagename="createPerson", 
+                errorname=f"Couldn't change rate. Update failed")
+
 
 if __name__ == '__main__':
     app.run(port=5000, host="0.0.0.0")
