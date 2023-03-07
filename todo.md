@@ -1,11 +1,11 @@
 # Outstanding functions  
 ## Parental functions  
-- ~~Parental login  ~~  
-- ~~Validate chores  ~~  
+- ~~Parental login~~  
+- ~~Validate chores~~  
 - Bank chores  
-- ~~Create chores  ~~  
+- ~~Create chores~~  
 - ~~Change chore rate~~   
-- ~~Create new users  ~~  
+- ~~Create new users~~  
 - Add chores to user  
 - remove/deactivate user    
 
@@ -19,5 +19,5 @@
 # Updates
 - Allow ad-hoc selection of non-recurring chores (kind of done...)  
   Maybe show list of recurring chores, then list of non-recurring chores below?  
-- ~~Update person list to show all people, regardless of active chore count  ~~
+- ~~Update person list to show all people, regardless of active chore count~~
 
