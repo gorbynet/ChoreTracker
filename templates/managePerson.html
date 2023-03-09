@@ -62,12 +62,11 @@
         {% for chore in chore_assignments %}
             <div class="form-group">
             {% if chore_assignments[chore]['assigned'] == 1 %}
-                
-                <input type="checkbox" name="{{ chore_assignments[chore]['ChoreID'] }}" class="form-check-input" checked>
+                <input type="checkbox" name="Chore{{ chore_assignments[chore]['ChoreID'] }}" class="form-check-input" checked>
             {% else %}
-                <input type="checkbox" name="{{ chore_assignments[chore]['ChoreID'] }}" class="form-check-input" >
+                <input type="checkbox" name="Chore{{ chore_assignments[chore]['ChoreID'] }}" class="form-check-input" >
             {% endif %}
-                <label for="{{ chore_assignments[chore]['ChoreID'] }}">   {{ chore_assignments[chore]['name'] }}</label>
+                <label for="Chore{{ chore_assignments[chore]['ChoreID'] }}">   {{ chore_assignments[chore]['name'] }}</label>
             </div>
         {% endfor %}
         

@@ -252,7 +252,7 @@ def managePerson():
         # need to be able to change name, role, balance
         roles = json.loads(utils.get_roles().T.to_json())
         chore_assignments = json.loads(utils.get_person_chore_assignment(PersonID=PersonID).T.to_json())
-        print(chore_assignments)
+        
         person = json.loads(utils.get_person_details(PersonID=PersonID).T.to_json())['0']
         person['confirmedMoney'] = locale.currency(person['confirmedMoney']/100)
         person['CurrentBalance'] = locale.currency(person['CurrentBalance']/100)
@@ -286,6 +286,11 @@ def updatePerson():
                 CurrentBalance=amount
 
             ):
+            # need to add/remove choreresponsibilities in line with checkboxes
+            for f in result:
+                if not f.startswith('Chore'):
+                    continue
+                print(f)
             return redirect(url_for('managePerson', personId=result['PersonId']))
         else:
             return render_template('error.html', 
