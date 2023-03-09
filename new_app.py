@@ -248,13 +248,22 @@ def managePeople():
 @app.route('/managePerson', methods=['GET'])
 def managePerson():
     if request.args.get('personId'):
+        PersonID = request.args.get('personId')
         # need to be able to change name, role, balance
         roles = json.loads(utils.get_roles().T.to_json())
-        person = json.loads(utils.get_person_details(PersonID=request.args.get('personId')).T.to_json())['0']
+        chore_assignments = json.loads(utils.get_person_chore_assignment(PersonID=PersonID).T.to_json())
+        print(chore_assignments)
+        person = json.loads(utils.get_person_details(PersonID=PersonID).T.to_json())['0']
         person['confirmedMoney'] = locale.currency(person['confirmedMoney']/100)
         person['CurrentBalance'] = locale.currency(person['CurrentBalance']/100)
         
-        return render_template("managePerson.html", title=f'Manage {person["PersonName"]}', person=person, roles=roles) 
+        return render_template(
+            "managePerson.html", 
+            title=f'Manage {person["PersonName"]}', 
+            person=person, 
+            roles=roles,
+            chore_assignments=chore_assignments
+            ) 
     else:
         return render_template('error.html', pageName="managePerson", errorName=f"Couldn't manage person. No Person ID")
     

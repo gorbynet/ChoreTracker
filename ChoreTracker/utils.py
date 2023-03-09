@@ -106,10 +106,14 @@ def delete_chore(choreid:int = None):
     """)
     return True
 
-def get_chores():
-    return query_db(q="""
-        SELECT * FROM chores
+def get_chores(active=False):
+    where_str = ''
+    if active:
+        where_str='where active=True'
+    return query_db(q=f"""
+        SELECT * FROM chores {where_str}
     """)
+
 
 
 def get_chore_details(ChoreId: int = None):
@@ -590,6 +594,29 @@ def get_person_chores(
     """)
     # return list(zip(chore_df['ChoreInstanceID'], chore_df['name'], chore_df['Completed'])) 
     return chore_df
+
+def get_person_chore_assignment(
+        PersonID: int = None
+        ) -> pd.DataFrame:
+    if PersonID is None:
+        raise NoPersonIdSuppliedError
+    
+    return query_db(q=f"""
+        select chores.name, 
+            chores.choreid,
+            IIF(pc.choreid IS NULL, 1, 0) as assigned
+        from chores
+        left join
+        (SELECT * FROM chores as c
+        left join
+        choreresponsibilities as cr
+        on c.choreid = cr.choreid
+        where cr.personid={PersonID}
+        
+        ) as pc
+        on chores.choreid = pc.choreid
+        where chores.active=True
+    """)
 
 def get_chores_table(
         validated: bool = False,
